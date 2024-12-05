@@ -115,14 +115,24 @@ part1Solve?.addEventListener("click", () => {
   stats?.replaceChildren(`${duration} ms`);
 });
 
+const canvas = document.getElementById("part2-canvas");
+const ctx = canvas.getContext("2d");
+
+ctx.clearRect(0, 0, canvas.width, canvas.height);
+ctx.fillStyle = "#202020";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
 part2Solve.addEventListener("click", () => {
   const start = performance.now();
   const input = inputElm.value.trim().split(/\s+/);
   let result = 0;
 
+  ctx.fillStyle = "white";
+  ctx.font = "30px Monospace";
   const rows = input.length;
   const cols = input[0].length;
   for (let i = 0; i < rows; ++i) {
+    ctx.fillText(input[i], 0, 30 * i);
     for (let j = 0; j < cols; ++j) {
       if (input[i][j] === "A") {
         if (input[i - 1] !== undefined && input[i + 1] !== undefined) {

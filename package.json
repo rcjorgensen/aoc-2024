@@ -1,13 +1,11 @@
 {
   "type": "module",
   "scripts": {
-    "build": "tsc --build",
-    "watch": "tsc --build --watch",
-    "serve": "http-server",
+    "dev": "browser-sync start --server --files \"**/*\"",
     "format": "prettier . --write"
   },
   "devDependencies": {
-    "http-server": "^14.1.1",
+    "browser-sync": "^3.0.3",
     "prettier": "^3.4.1",
     "typescript": "^5.7.2"
   }
