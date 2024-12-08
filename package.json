@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "browser-sync start --server --files \"**/*\"",
+    "dev": "browser-sync start --server --files \"**/*\" --no-open",
     "format": "prettier . --write"
   },
   "devDependencies": {
