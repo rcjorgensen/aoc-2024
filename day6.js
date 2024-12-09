@@ -229,11 +229,180 @@ part1Solve?.addEventListener("click", () => {
   stats?.replaceChildren(`${duration} ms`);
 });
 
+const DIR_UP = 1;
+const DIR_RIGHT = 2;
+const DIR_DOWN = 4;
+const DIR_LEFT = 8;
+
+class Game2 {
+  /**
+   * @param {number} rows
+   * @param {number} cols
+   */
+  constructor(rows, cols) {
+    this.rows = rows;
+    this.cols = cols;
+
+    this.board = [];
+    for (let i = 0; i < rows; ++i) {
+      this.board.push(Array(cols).fill(0));
+    }
+
+    this.positionX = null;
+    this.positionY = null;
+
+    this.direction = DIR_UP;
+
+    this.visited = [];
+    for (let i = 0; i < rows; ++i) {
+      this.visited.push(Array(cols).fill(0));
+    }
+
+    this.done = false;
+    this.loops = false;
+  }
+
+  /**
+   * @param {string} input
+   * @returns {Board}
+   */
+  static parse(input) {
+    const rows = input.trim().split("\n");
+    const game = new Game2(rows.length, rows[0].length);
+    for (let i = 0; i < rows.length; ++i) {
+      for (let j = 0; j < rows[0].length; ++j) {
+        if (rows[i][j] === "#") {
+          game.board[i][j] = 1;
+          continue;
+        }
+
+        if (rows[i][j] === "^") {
+          game.positionX = j;
+          game.positionY = i;
+          game.visited[i][j] |= DIR_UP;
+        }
+      }
+    }
+    return game;
+  }
+
+  next() {
+    switch (this.direction) {
+      case DIR_UP:
+        if (this.board[this.positionY - 1] === undefined) {
+          this.done = true;
+          return;
+        }
+
+        if (this.board[this.positionY - 1][this.positionX] === 1) {
+          this.direction = DIR_RIGHT;
+          return;
+        }
+
+        if (this.visited[this.positionY - 1][this.positionX] & this.direction) {
+          this.done = true;
+          this.loops = true;
+          return;
+        }
+
+        this.positionY -= 1;
+        this.visited[this.positionY][this.positionX] |= this.direction;
+
+        break;
+      case DIR_RIGHT:
+        if (this.board[this.positionY][this.positionX + 1] === undefined) {
+          this.done = true;
+          return;
+        }
+
+        if (this.board[this.positionY][this.positionX + 1] === 1) {
+          this.direction = DIR_DOWN;
+          return;
+        }
+
+        if (this.visited[this.positionY][this.positionX + 1] & this.direction) {
+          this.done = true;
+          this.loops = true;
+          return;
+        }
+
+        this.positionX += 1;
+        this.visited[this.positionY][this.positionX] |= this.direction;
+
+        break;
+      case DIR_DOWN:
+        if (this.board[this.positionY + 1] === undefined) {
+          this.done = true;
+          return;
+        }
+
+        if (this.board[this.positionY + 1][this.positionX] === 1) {
+          this.direction = DIR_LEFT;
+          return;
+        }
+
+        if (this.visited[this.positionY + 1][this.positionX] & this.direction) {
+          this.done = true;
+          this.loops = true;
+          return;
+        }
+
+        this.positionY += 1;
+        this.visited[this.positionY][this.positionX] |= this.direction;
+
+        break;
+      case DIR_LEFT:
+        if (this.board[this.positionY][this.positionX - 1] === undefined) {
+          this.done = true;
+          return;
+        }
+
+        if (this.board[this.positionY][this.positionX - 1] === 1) {
+          this.direction = DIR_UP;
+          return;
+        }
+
+        if (this.visited[this.positionY][this.positionX - 1] & this.direction) {
+          this.done = true;
+          this.loops = true;
+          return;
+        }
+
+        this.positionX -= 1;
+        this.visited[this.positionY][this.positionX] |= this.direction;
+
+        break;
+    }
+  }
+}
 part2Solve.addEventListener("click", () => {
   const start = performance.now();
   const input = inputElm.value.trim().split("\n");
 
   let result = 0;
+
+  let game = Game2.parse(inputElm.value);
+  const rows = game.rows;
+  const cols = game.cols;
+
+  for (let i = 0; i < rows; ++i) {
+    for (let j = 0; j < cols; ++j) {
+      if (game.board[i][j] === 1) {
+        continue;
+      }
+      game.board[i][j] = 1;
+
+      while (!game.done) {
+        game.next();
+      }
+
+      if (game.loops) {
+        ++result;
+      }
+
+      game = Game2.parse(inputElm.value);
+    }
+  }
 
   const duration = performance.now() - start;
 
