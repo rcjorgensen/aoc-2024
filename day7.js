@@ -27,6 +27,32 @@ function search(target, operands, result) {
   );
 }
 
+/**
+ * @param {number} target
+ * @param {string[]} operands
+ * @param {number} result
+ *
+ * @returns {boolean} true if the result is equal to the target.
+ */
+function search2(target, operands, result) {
+  if (result > target) {
+    return false;
+  }
+
+  if (operands.length === 0) {
+    return result === target;
+  }
+
+  const operand = parseInt(operands[0]);
+  const rest = operands.slice(1);
+
+  return (
+    search2(target, rest, result + operand) ||
+    search2(target, rest, result * operand) ||
+    search2(target, rest, parseInt(`${result}${operand}`))
+  );
+}
+
 part1Solve.addEventListener("click", () => {
   const start = performance.now();
   const input = inputElm.value.trim().split("\n");
@@ -56,6 +82,15 @@ part2Solve.addEventListener("click", () => {
   const input = inputElm.value.trim().split("\n");
 
   let result = 0;
+
+  for (const line of input) {
+    const [lhs, rhs] = line.trim().split(":");
+    const operands = rhs.trim().split(" ");
+    const target = parseInt(lhs);
+    if (search2(target, operands.slice(1), parseInt(operands[0]))) {
+      result += target;
+    }
+  }
 
   const duration = performance.now() - start;
 
